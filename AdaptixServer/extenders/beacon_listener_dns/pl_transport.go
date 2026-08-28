@@ -370,6 +370,8 @@ func (t *TransportDNS) handleGET(req *dnsRequest, w dns.ResponseWriter) []byte {
 		}
 	}
 
+	total, offset, data, taskNonce, isEmpty := Ts.TsFrameGetChunkSticky(agentId, reqOffset, maxChunk, nil)
+
 	stats, n, ok := Ts.TsFrameTakeStatTasks(agentId)
 	if ok && !stats.Select().Empty() {
 		msg := fmt.Sprintf("Sent %s", adaptix.FormatByteSize(int(total)))
@@ -378,8 +380,6 @@ func (t *TransportDNS) handleGET(req *dnsRequest, w dns.ResponseWriter) []byte {
 		}
 		Ts.TsAgentConsoleOutput(agentId, "", adaptix.MESSAGE_INFO, msg, "", false)
 	}
-
-	total, offset, data, taskNonce, isEmpty := Ts.TsFrameGetChunkSticky(agentId, reqOffset, maxChunk, nil)
 	if isEmpty || len(data) == 0 {
 		return nil
 	}
